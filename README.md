@@ -7,7 +7,7 @@ difficulty 6 (256x harder than difficulty 4) takes tens of milliseconds on GPU (
 
 I also used an optimized mining algorithm, so that the inner loop only has to re-process the last SHA256 block rather than the whole message (this alone should give a 9x speedup over the naive algorithm).
 
-To use it, install `tamperscript.js` with tampermonkey (or similar userscript tool) and then run `python3 offloadd.py`. Anubis checks in your browser should be virtually instantaneous now.
+To use it, install `tamperscript.user.js` with tampermonkey (or similar userscript tool) and then run `python3 offloadd.py`. Anubis checks in your browser should be virtually instantaneous now.
 
 ## Demo Video
 
