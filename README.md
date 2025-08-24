@@ -9,6 +9,12 @@ I also used an optimized mining algorithm, so that the inner loop only has to re
 
 To use it, install `tamperscript.js` with tampermonkey (or similar userscript tool) and then run `python3 offloadd.py`. Anubis checks in your browser should be virtually instantaneous now.
 
+## Demo Video
+
+First load is with the userscript disabled, second is enabled (with cookies cleared in between)
+
+https://github.com/user-attachments/assets/7202f863-e068-4abc-9944-643511ffd3ed
+
 ## How?
 
 Normally, Anubis [computes PoW](https://github.com/TecharoHQ/anubis/blob/main/docs/docs/design/why-proof-of-work.mdx#how-anubis-proof-of-work-scheme-works) in your browser, using multiple worker threads via the [Web Workers API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers).
