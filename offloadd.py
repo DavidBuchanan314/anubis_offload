@@ -15,6 +15,8 @@ async def offload(request: web.Request):
 	message = await request.json()
 	print("request", message)
 	data, difficulty = message["data"], message["difficulty"]
+	if difficulty >= 10:
+		raise Exception(f"implausibly high difficulty ({difficulty}), bailing out")
 	start = time.time()
 	if 0:
 		found_nonce, found_hash = await cpumine(data, difficulty)
