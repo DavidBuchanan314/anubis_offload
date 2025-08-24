@@ -111,7 +111,8 @@ __kernel void mine(
 	__global uint64_t* found_nonce,
 	__global uint32_t state_found[8],
 	__global const uint32_t state_in[8],
-	const uint64_t base
+	const uint64_t base,
+	const uint32_t prefixlen
 )
 {
 	uint64_t gid = get_global_id(0);
@@ -122,6 +123,7 @@ __kernel void mine(
 	for (uint64_t i=base+gid; i<base+STEPS_PER_TASK*gid_max; i+=gid_max) {
 		uint32_t state_out[8], msg[16];
 
+		// TODO: figure out how to avoid this copy
 		state_in_copy[0] = state_in[0];
 		state_in_copy[1] = state_in[1];
 		state_in_copy[2] = state_in[2];
@@ -130,13 +132,7 @@ __kernel void mine(
 		state_in_copy[5] = state_in[5];
 		state_in_copy[6] = state_in[6];
 		state_in_copy[7] = state_in[7];
-		// TODO: set up msg properly
-		//msg[0] = i>>32;
-		//msg[1] = i;
-		//msg[2] = 0x80000000;
-		// int max = 9 22 3372 0368 5477 5807
-		//           1 00 0000 0000 0000 0000
-		//           1000 0000 0000 0000 000
+
 		msg[0] = 0x31303030 | (((i>>51)&7) << 16) | (((i>>48)&7) << 8) | (((i>>45)&7) << 0);
 		msg[1] = 0x30303030 | (((i>>42)&7) << 30) | (((i>>39)&7) << 16) | (((i>>36)&7) << 8) | (((i>>33)&7) << 0);
 		msg[2] = 0x30303030 | (((i>>30)&7) << 30) | (((i>>27)&7) << 16) | (((i>>24)&7) << 8) | (((i>>21)&7) << 0);
@@ -152,7 +148,7 @@ __kernel void mine(
 		msg[12] = 0;
 		msg[13] = 0;
 		msg[14] = 0;
-		msg[15] = 19*8;
+		msg[15] = (prefixlen+19)*8;
 		sha256_update(state_out, state_in_copy, msg);
 		// TODO: check if state_out has leading zeroes
 		if ((state_out[0] & 0xffffff00) == 0) {
