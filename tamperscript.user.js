@@ -37,7 +37,7 @@ function looks_like_anubis_pow(message) {
 }
 
 hook_proto(window.Worker, "postMessage", (that, orig, [message, options]) => {
-	console.log("hooked postMessage", message, options);
+	//console.log("hooked postMessage", message, options);
 	
 	// passthru for non-anubis-y messages
 	if (!looks_like_anubis_pow(message)) {
