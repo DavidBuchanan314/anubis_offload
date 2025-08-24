@@ -114,7 +114,7 @@ __kernel void mine(
 	const uint64_t base,
 	const uint32_t prefixlen,
 	const uint32_t mask0,
-	const uint32_t mask1,
+	const uint32_t mask1
 )
 {
 	uint64_t gid = get_global_id(0);
