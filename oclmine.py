@@ -40,17 +40,31 @@ class OCLMiner():
 		prg = cl.Program(ctx, open(srcdir + "/sha256.cl").read()).build()
 		self.kernel = cl.Kernel(prg, "mine")
 
-	def mine(self, data: str) -> tuple[int, str]:
+	def mine(self, data: str, difficulty=4) -> tuple[int, str]:
 		start = time.time()
+
 		self.res_flag[0] = 0
 		initial_h = np.array(sha256_prefix(data.encode()), dtype=np.uint32)
 		cl.enqueue_copy(self.queue, self.res_flag_buf, self.res_flag)
 		cl.enqueue_copy(self.queue, self.initial_h_buf, initial_h)
 
+		mask = "f"*difficulty + "0"*16
+		mask0 = int(mask[:8], 16)
+		mask1 = int(mask[8:16], 16)
+
 		base = 0
 		while True:
 			print("working...", hex(base))
-			self.kernel(self.queue, (WORK_SIZE,), None, self.res_flag_buf, self.res_nonce_buf, self.res_h_buf, self.initial_h_buf, np.uint64(base), np.uint32(len(data)))
+			self.kernel(self.queue, (WORK_SIZE,), None,
+				self.res_flag_buf,
+				self.res_nonce_buf,
+				self.res_h_buf,
+				self.initial_h_buf,
+				np.uint64(base),
+				np.uint32(len(data)),
+				np.uint32(mask0),
+				np.uint32(mask1)
+			)
 			cl.enqueue_copy(self.queue, self.res_flag, self.res_flag_buf)
 			if self.res_flag[0]:
 				break

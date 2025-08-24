@@ -19,7 +19,7 @@ async def offload(request: web.Request):
 	if 0:
 		found_nonce, found_hash = await cpumine(data, difficulty)
 	else:
-		found_nonce, found_hash = request.app["miner"].mine(data)
+		found_nonce, found_hash = request.app["miner"].mine(data, difficulty)
 	duration = time.time() - start
 	print(f"found {found_nonce} in {int(duration*1000)}ms")
 	return web.json_response(

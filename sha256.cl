@@ -112,7 +112,9 @@ __kernel void mine(
 	__global uint32_t state_found[8],
 	__global const uint32_t state_in[8],
 	const uint64_t base,
-	const uint32_t prefixlen
+	const uint32_t prefixlen,
+	const uint32_t mask0,
+	const uint32_t mask1,
 )
 {
 	uint64_t gid = get_global_id(0);
@@ -150,8 +152,8 @@ __kernel void mine(
 		msg[14] = 0;
 		msg[15] = (prefixlen+19)*8;
 		sha256_update(state_out, state_in_copy, msg);
-		// TODO: check if state_out has leading zeroes
-		if ((state_out[0] & 0xffffff00) == 0) {
+
+		if (((state_out[0] & mask0) == 0) && ((state_out[1] & mask1) == 0)) {
 			if (atomic_cmpxchg(found_flag, 0, 1) == 0) {
 				// we found it first
 
