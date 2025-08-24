@@ -64,5 +64,8 @@ class OCLMiner():
 
 
 if __name__ == "__main__":
+	import time
 	miner = OCLMiner()
+	start = time.time()
 	print(miner.mine("A"*64))
+	print(time.time()-start)
