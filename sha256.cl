@@ -38,7 +38,7 @@ constant uint K[64] = {
 #define SIG2(x) (ROTR(x, 7) ^ ROTR(x, 18) ^ SHR(x, 3))
 #define SIG3(x) (ROTR(x, 17) ^ ROTR(x, 19) ^ SHR(x, 10))
 
-void sha256_update(uint32_t state_out[8], uint32_t state_in[8], uint32_t block[16]) {
+void sha256_update(uint32_t state_out[8], const uint32_t state_in[8], uint32_t block[16]) {
 	uint a = state_in[0];
 	uint b = state_in[1];
 	uint c = state_in[2];
@@ -118,23 +118,30 @@ __kernel void twice(
 	uint64_t gid_max = get_global_size(0);
 
 	uint32_t state_in_copy[8];
-	state_in_copy[0] = state_in[0];
-	state_in_copy[1] = state_in[1];
-	state_in_copy[2] = state_in[2];
-	state_in_copy[3] = state_in[3];
-	state_in_copy[4] = state_in[4];
-	state_in_copy[5] = state_in[5];
-	state_in_copy[6] = state_in[6];
-	state_in_copy[7] = state_in[7];
 
 	for (uint64_t i=base+gid; i<STEPS_PER_TASK*gid_max; i+=gid_max) {
 		uint32_t state_out[8], msg[16];
+
+		state_in_copy[0] = state_in[0];
+		state_in_copy[1] = state_in[1];
+		state_in_copy[2] = state_in[2];
+		state_in_copy[3] = state_in[3];
+		state_in_copy[4] = state_in[4];
+		state_in_copy[5] = state_in[5];
+		state_in_copy[6] = state_in[6];
+		state_in_copy[7] = state_in[7];
 		// TODO: set up msg properly
-		msg[0] = i>>32;
-		msg[1] = i;
-		msg[2] = 0x80;
-		msg[3] = 0;
-		msg[4] = 0;
+		//msg[0] = i>>32;
+		//msg[1] = i;
+		//msg[2] = 0x80000000;
+		// int max = 9 22 3372 0368 5477 5807
+		//           1 00 0000 0000 0000 0000
+		//           1000 0000 0000 0000 000
+		msg[0] = 0x31303030 | (((i>>51)&7) << 16) | (((i>>48)&7) << 8) | (((i>>45)&7) << 0);
+		msg[1] = 0x30303030 | (((i>>42)&7) << 30) | (((i>>39)&7) << 16) | (((i>>36)&7) << 8) | (((i>>33)&7) << 0);
+		msg[2] = 0x30303030 | (((i>>30)&7) << 30) | (((i>>27)&7) << 16) | (((i>>24)&7) << 8) | (((i>>21)&7) << 0);
+		msg[3] = 0x30303030 | (((i>>18)&7) << 24) | (((i>>15)&7) << 16) | (((i>>12)&7) << 8) | (((i>>9)&7) << 0);
+		msg[4] = 0x30303080 | (((i>>6)&7) << 24) | (((i>>3)&7) << 16) | ((i&7) << 8);
 		msg[5] = 0;
 		msg[6] = 0;
 		msg[7] = 0;
@@ -145,10 +152,10 @@ __kernel void twice(
 		msg[12] = 0;
 		msg[13] = 0;
 		msg[14] = 0;
-		msg[15] = 0x40000000; // hex(int.from_bytes((8*8).to_bytes(4), "little"))
+		msg[15] = 19*8;
 		sha256_update(state_out, state_in_copy, msg);
 		// TODO: check if state_out has leading zeroes
-		if ((state_out[0] & 0xffff0000) == 0) {
+		if ((state_out[0] & 0xf0000000) == 0) {
 			if (atomic_cmpxchg(found_flag, 0, 1) == 0) {
 				// we found it first
 

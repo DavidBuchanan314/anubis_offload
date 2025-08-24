@@ -33,7 +33,7 @@ srcdir = os.path.dirname(os.path.realpath(__file__))
 prg = cl.Program(ctx, open(srcdir + "/sha256.cl").read()).build()
 kernel = cl.Kernel(prg, "twice")
 
-WORK_SIZE = 0x2000
+WORK_SIZE = 0x20
 STEPS_PER_TASK = 0x100 # keep in sync with cl source
 
 base = 0
@@ -50,5 +50,5 @@ cl.enqueue_copy(queue, result, res_h_buf)
 cl.enqueue_copy(queue, res_nonce, res_nonce_buf)
 
 print(int(res_flag[0]))
-print(int(res_nonce[0]))
+print(f"1{int(res_nonce[0]):0>18o}")
 print(b"".join(int(x).to_bytes(4, "big") for x in result).hex())
