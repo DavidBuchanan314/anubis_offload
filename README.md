@@ -48,3 +48,9 @@ I haven't tested on many sites, but all the ones I tried thus far worked fine.
 ## What if a malicious site sends fake PoW requests, to annoy me?
 
 Sure, they could do that, I guess. But malicious sites can compute PoW in your browser anyway. I've set a difficulty cap in `offloadd` so it shouldn't waste more than 1 minute or so of compute.
+
+## Misc Implementaion Details
+
+Anubis expects the `nonce` value (the thing you search for during mining) to be an integer, which is stringified to decimal before hashing. To simplify the integer-to-string conversion in the inner loop, I use octal rather than decimal, because it's just a matter of branchless bit-twiddling rather than involving division/modulo, or digitwise-long-addition-with-carry. I add `100000...` to the number to keep it a fixed width, and store it in the JSON as a string literal so that the browser doesn't mangle it when it exceeds the 2^53 limit.
+
+My desktop has a beefy-ish GPU, while my laptop(s) do not. I use `ssh -N -L 1237:localhost:1237 my_desktop_addr` to forward the `offloadd` service port - it's important that the browser accesses it via `localhost` because there are security exceptions for HTTP on localhost (otherwise you might get mixed-content exceptions). This is another thing that a proper browser extension might be able to work around.
