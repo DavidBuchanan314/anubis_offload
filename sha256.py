@@ -118,7 +118,7 @@ def sha256_prefix(m):
 	
 	# 6.2.1, 2) pad the message, and parse it into blocks
 	blocks = list(block_iterator(pad_message(m)))[:-1]
-	print(blocks)
+	#print(blocks)
 	
 	# 6.2.2 - SHA-256 Hash Computation
 	for block in blocks:

@@ -1,6 +1,8 @@
 from aiohttp import web
-from cpumine import cpumine
 import time
+
+from cpumine import cpumine
+from oclmine import OCLMiner
 
 routes = web.RouteTableDef()
 
@@ -14,7 +16,10 @@ async def offload(request: web.Request):
 	print("request", message)
 	data, difficulty = message["data"], message["difficulty"]
 	start = time.time()
-	found_nonce, found_hash = await cpumine(data, difficulty)
+	if 0:
+		found_nonce, found_hash = await cpumine(data, difficulty)
+	else:
+		found_nonce, found_hash = request.app["miner"].mine(data)
 	duration = time.time() - start
 	print(f"found {found_nonce} in {int(duration*1000)}ms ({int(found_nonce/duration)}H/s)")
 	return web.json_response(
@@ -22,7 +27,7 @@ async def offload(request: web.Request):
 			"hash": found_hash,
 			"data": data,
 			"difficulty": difficulty,
-			"nonce": found_nonce
+			"nonce": str(found_nonce) # make sure it survives jsonification!
 		},
 		headers={
 			"Access-Control-Allow-Origin": "*"
@@ -32,5 +37,6 @@ async def offload(request: web.Request):
 
 if __name__ == "__main__":
 	app = web.Application()
+	app["miner"] = OCLMiner()
 	app.add_routes(routes)
 	web.run_app(app, port=1237)

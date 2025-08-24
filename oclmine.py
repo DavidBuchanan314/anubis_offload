@@ -3,7 +3,7 @@ import pyopencl as cl
 import numpy as np
 from sha256 import sha256_prefix
 
-WORK_SIZE = 0x1000
+WORK_SIZE = 0x4000
 STEPS_PER_TASK = 0x100 # keep in sync with cl source
 
 class OCLMiner():
