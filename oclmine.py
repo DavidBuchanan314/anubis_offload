@@ -52,10 +52,12 @@ class OCLMiner():
 		mask0 = int(mask[:8], 16)
 		mask1 = int(mask[8:16], 16)
 
+		work_size = min((16**difficulty) // STEPS_PER_TASK, WORK_SIZE)
+
 		base = 0
 		while True:
 			print("working...", hex(base))
-			self.kernel(self.queue, (WORK_SIZE,), None,
+			self.kernel(self.queue, (work_size,), None,
 				self.res_flag_buf,
 				self.res_nonce_buf,
 				self.res_h_buf,
@@ -68,13 +70,13 @@ class OCLMiner():
 			cl.enqueue_copy(self.queue, self.res_flag, self.res_flag_buf)
 			if self.res_flag[0]:
 				break
-			base += WORK_SIZE * STEPS_PER_TASK
+			base += work_size * STEPS_PER_TASK
 
 		result = np.empty_like(self.initial_h)
 		cl.enqueue_copy(self.queue, result, self.res_h_buf)
 		cl.enqueue_copy(self.queue, self.res_nonce, self.res_nonce_buf)
 
-		num_hashes = base + WORK_SIZE * STEPS_PER_TASK
+		num_hashes = base + work_size * STEPS_PER_TASK
 		duration = time.time() - start
 		print(f"computed {num_hashes} hashes in {int(duration*1000)}ms ({int(num_hashes / duration)}H/s)")
 

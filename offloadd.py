@@ -1,4 +1,5 @@
 from aiohttp import web
+from asyncio import Lock
 import time
 
 from cpumine import cpumine
@@ -17,12 +18,13 @@ async def offload(request: web.Request):
 	data, difficulty = message["data"], message["difficulty"]
 	if difficulty >= 10:
 		raise Exception(f"implausibly high difficulty ({difficulty}), bailing out")
-	start = time.time()
-	if 0:
-		found_nonce, found_hash = await cpumine(data, difficulty)
-	else:
-		found_nonce, found_hash = request.app["miner"].mine(data, difficulty)
-	duration = time.time() - start
+	async with request.app["lock"]:
+		start = time.time()
+		if 0:
+			found_nonce, found_hash = await cpumine(data, difficulty)
+		else:
+			found_nonce, found_hash = request.app["miner"].mine(data, difficulty)
+		duration = time.time() - start
 	print(f"found {found_nonce} in {int(duration*1000)}ms")
 	return web.json_response(
 		{
@@ -39,6 +41,7 @@ async def offload(request: web.Request):
 
 if __name__ == "__main__":
 	app = web.Application()
+	app["lock"] = Lock()
 	app["miner"] = OCLMiner()
 	app.add_routes(routes)
 	web.run_app(app, port=1237)

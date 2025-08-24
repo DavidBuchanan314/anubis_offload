@@ -43,6 +43,8 @@ Personally I don't want to change my UA for all websites (because it breaks thin
 
 Yeah, that's a problem. If a site has a strict CSP configured, our userscript will not be able to reach out to the PoW server. Writing a proper browser extension (as opposed to a userscript) should solve this, but packaging browser extensions is a pain.
 
+I haven't tested on many sites, but all the ones I tried thus far worked fine.
+
 ## What if a malicious site sends fake PoW requests, to annoy me?
 
 Sure, they could do that, I guess. But malicious sites can compute PoW in your browser anyway. I've set a difficulty cap in `offloadd` so it shouldn't waste more than 1 minute or so of compute.
