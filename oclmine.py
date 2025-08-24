@@ -31,9 +31,9 @@ cl.enqueue_copy(queue, res_h_buf, initial_h)
 
 srcdir = os.path.dirname(os.path.realpath(__file__))
 prg = cl.Program(ctx, open(srcdir + "/sha256.cl").read()).build()
-kernel = cl.Kernel(prg, "twice")
+kernel = cl.Kernel(prg, "mine")
 
-WORK_SIZE = 0x20
+WORK_SIZE = 0x1000
 STEPS_PER_TASK = 0x100 # keep in sync with cl source
 
 base = 0

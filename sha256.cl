@@ -106,7 +106,7 @@ void sha256_update(uint32_t state_out[8], const uint32_t state_in[8], uint32_t b
 	state_out[7] = state_in[7] + h;
 }
 
-__kernel void twice(
+__kernel void mine(
 	__global volatile uint* found_flag,
 	__global uint64_t* found_nonce,
 	__global uint32_t state_found[8],
@@ -119,7 +119,7 @@ __kernel void twice(
 
 	uint32_t state_in_copy[8];
 
-	for (uint64_t i=base+gid; i<STEPS_PER_TASK*gid_max; i+=gid_max) {
+	for (uint64_t i=base+gid; i<base+STEPS_PER_TASK*gid_max; i+=gid_max) {
 		uint32_t state_out[8], msg[16];
 
 		state_in_copy[0] = state_in[0];
@@ -155,7 +155,7 @@ __kernel void twice(
 		msg[15] = 19*8;
 		sha256_update(state_out, state_in_copy, msg);
 		// TODO: check if state_out has leading zeroes
-		if ((state_out[0] & 0xf0000000) == 0) {
+		if ((state_out[0] & 0xffffff00) == 0) {
 			if (atomic_cmpxchg(found_flag, 0, 1) == 0) {
 				// we found it first
 
