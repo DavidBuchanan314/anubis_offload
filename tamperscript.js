@@ -28,7 +28,7 @@ function hook_proto(clazz, method_name, hook_impl) {
 const ANUBIS_KEYS = new Set(["data", "difficulty", "nonce", "threads"]);
 function looks_like_anubis_pow(message) {
 	if (typeof message !== "object") return false;
-	if (!message.keys().every(k => ANUBIS_KEYS.has(k))) return false;
+	if (!Object.keys(message).every(k => ANUBIS_KEYS.has(k))) return false;
 	if (typeof message.data !== "string") return false;
 	if (typeof message.difficulty !== "number") return false;
 	if (typeof message.nonce !== "number") return false;
