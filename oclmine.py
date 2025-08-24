@@ -40,9 +40,10 @@ class OCLMiner():
 		self.kernel = cl.Kernel(prg, "mine")
 
 	def mine(self, data: str) -> tuple[int, str]:
-		print(data)
-
+		start = time.time()
+		self.res_flag[0] = 0
 		initial_h = np.array(sha256_prefix(data.encode()), dtype=np.uint32)
+		cl.enqueue_copy(self.queue, self.res_flag_buf, self.res_flag)
 		cl.enqueue_copy(self.queue, self.initial_h_buf, initial_h)
 
 		base = 0
@@ -57,6 +58,10 @@ class OCLMiner():
 		result = np.empty_like(self.initial_h)
 		cl.enqueue_copy(self.queue, result, self.res_h_buf)
 		cl.enqueue_copy(self.queue, self.res_nonce, self.res_nonce_buf)
+
+		num_hashes = base + WORK_SIZE * STEPS_PER_TASK
+		duration = time.time() - start
+		print(f"computed {num_hashes} hashes in {int(duration*1000)}ms ({int(num_hashes / duration)}H/s)")
 
 		octalized = int(f"1{int(self.res_nonce[0]):0>18o}")
 		hash_out = b"".join(int(x).to_bytes(4, "big") for x in result).hex()
