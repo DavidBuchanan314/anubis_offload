@@ -1,4 +1,5 @@
 import os
+import time
 import pyopencl as cl
 import numpy as np
 from sha256 import sha256_prefix
