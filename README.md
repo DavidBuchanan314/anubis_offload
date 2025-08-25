@@ -35,7 +35,7 @@ It shouldn't do. The idea behind Anubis seems to be that mass scrapers can't be 
 
 ## Why not just change your user-agent to one that Anubis allows unconditionally?
 
-You can do that, if you want - and there are browser extensions that do it: https://addons.mozilla.org/en-GB/firefox/addon/anubis-bypass/
+You can do that, if you want - and there are browser extensions that do it: https://addons.mozilla.org/en-GB/firefox/addon/nopow/
 
 Personally I don't want to change my UA for all websites (because it breaks things), and curating a manual list of exceptions sounds even more tedious than waiting for PoW to complete.
 
