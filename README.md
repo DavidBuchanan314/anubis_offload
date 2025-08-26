@@ -37,7 +37,9 @@ It shouldn't do. The idea behind Anubis seems to be that mass scrapers can't be 
 
 You can do that, if you want - and there are browser extensions that do it: https://addons.mozilla.org/en-GB/firefox/addon/nopow/
 
-Personally I don't want to change my UA for all websites (because it breaks things), and curating a manual list of exceptions sounds even more tedious than waiting for PoW to complete.
+~~Personally I don't want to change my UA for all websites (because it breaks things), and curating a manual list of exceptions sounds even more tedious than waiting for PoW to complete.~~
+
+Actually, I believe the above extension figures out which pages need a spoofed UA automatically, maybe it's not so bad after all. UA spoofing seems like something more likely to be used by scrapers though, and therefore more likely to get patched out.
 
 ## What About CSP?
 
